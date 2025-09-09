@@ -1102,277 +1102,135 @@
         }
         
         function emailForm() {
-            // Show working message
             showAlert('Förbereder e-post...', 'info');
             
-            // Collect all form data
-            const formData = {
-                basic: {},
-                project: {},
-                tests: [],
-                signature: {}
-            };
+            // Create a complete HTML email with the filled form
+            const formHtml = createFilledFormHTML();
+            const subject = getEmailSubject();
             
-            // Basic info
-            const basicInputs = document.querySelectorAll('.section:first-of-type input');
-            formData.basic.number = basicInputs[0]?.value || '';
-            formData.basic.model = basicInputs[1]?.value || '';
-            
-            // Project info
-            const projectInputs = document.querySelectorAll('.section:nth-of-type(2) input');
-            formData.project.owner = projectInputs[0]?.value || '';
-            formData.project.manager = projectInputs[1]?.value || '';
-            formData.project.technician = projectInputs[2]?.value || '';
-            formData.project.workOrder = projectInputs[3]?.value || '';
-            
-            // Test results - only include filled data
-            const testRows = document.querySelectorAll('.test-table tbody tr');
-            testRows.forEach((row, index) => {
-                const cells = row.querySelectorAll('td');
-                const description = cells[0]?.textContent || '';
-                const notInInstall = cells[1]?.querySelector('input')?.checked || false;
-                const checked = cells[2]?.querySelector('input')?.checked || false;
-                const sign1 = cells[3]?.querySelector('input')?.value || '';
-                const remarks = cells[4]?.querySelector('textarea')?.value || '';
-                const corrected = cells[5]?.querySelector('input')?.checked || false;
-                const sign2 = cells[6]?.querySelector('input')?.value || '';
-                
-                // Only include if there's actual data
-                if (notInInstall || checked || sign1 || remarks || corrected || sign2) {
-                    formData.tests.push({
-                        description,
-                        notInInstall,
-                        checked,
-                        sign1,
-                        remarks,
-                        corrected,
-                        sign2
-                    });
-                }
-            });
-            
-            // Signature data
-            const signatureInputs = document.querySelectorAll('.signature-input');
-            formData.signature.selfCheck = signatureInputs[0]?.value || '';
-            formData.signature.name = signatureInputs[1]?.value || '';
-            formData.signature.date = signatureInputs[2]?.value || '';
-            
-            // Create compact email content
-            let emailBody = `SafeTeam Högtalare Provningsprotokoll\n`;
-            emailBody += `======================================\n\n`;
-            
-            // Basic info
-            emailBody += `ENHETSINFO:\n`;
-            if (formData.basic.number) emailBody += `Nummer: ${formData.basic.number}\n`;
-            if (formData.basic.model) emailBody += `Modell: ${formData.basic.model}\n`;
-            emailBody += `\n`;
-            
-            // Project info
-            emailBody += `PROJEKT:\n`;
-            if (formData.project.owner) emailBody += `Ägare: ${formData.project.owner}\n`;
-            if (formData.project.manager) emailBody += `Projektledare: ${formData.project.manager}\n`;
-            if (formData.project.technician) emailBody += `Tekniker: ${formData.project.technician}\n`;
-            if (formData.project.workOrder) emailBody += `Arbetsorder: ${formData.project.workOrder}\n`;
-            emailBody += `\n`;
-            
-            // Test results - only filled ones
-            if (formData.tests.length > 0) {
-                emailBody += `KONTROLLPUNKTER:\n`;
-                formData.tests.forEach(test => {
-                    emailBody += `\n• ${test.description}\n`;
-                    if (test.notInInstall) emailBody += `  - Ej i anläggning: JA\n`;
-                    if (test.checked) emailBody += `  - Kontrollerad: JA\n`;
-                    if (test.sign1) emailBody += `  - Sign: ${test.sign1}\n`;
-                    if (test.remarks) emailBody += `  - Anmärkning: ${test.remarks}\n`;
-                    if (test.corrected) emailBody += `  - Åtgärdad: JA\n`;
-                    if (test.sign2) emailBody += `  - Åtgärd sign: ${test.sign2}\n`;
-                });
-                emailBody += `\n`;
-            }
-            
-            // Signature
-            emailBody += `SIGNERING:\n`;
-            if (formData.signature.selfCheck) emailBody += `Egenkontroll: ${formData.signature.selfCheck}\n`;
-            if (formData.signature.name) emailBody += `Namn: ${formData.signature.name}\n`;
-            if (formData.signature.date) emailBody += `Datum: ${formData.signature.date}\n`;
-            
-            emailBody += `\n---\nSafeTeam Provningsprotokoll\nKB04, 2024-10-18, SR`;
-            
-            // Create subject
-            const subject = `SafeTeam Provningsprotokoll${formData.basic.model ? ' - ' + formData.basic.model : ''}${formData.basic.number ? ' (' + formData.basic.number + ')' : ''}`;
-            
-            // Create HTML email body for better formatting
-            const htmlEmailBody = createHtmlEmailBody(formData, subject);
-            
-            // Try different email approaches
+            // Try to open email client with HTML form
             try {
-                // Show options dialog
-                const emailChoice = confirm('Välj e-post format:\n\nOK = HTML-formaterad e-post (rekommenderas)\nAvbryt = Enkel text-e-post');
+                const mailtoLink = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(formHtml)}`;
                 
-                let mailtoLink;
-                if (emailChoice) {
-                    // HTML formatted email
-                    mailtoLink = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(htmlEmailBody)}`;
-                } else {
-                    // Plain text email
-                    mailtoLink = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
-                }
+                // Open email client
+                window.location.href = mailtoLink;
                 
-                // Create a temporary link and click it
-                const tempLink = document.createElement('a');
-                tempLink.href = mailtoLink;
-                tempLink.style.display = 'none';
-                document.body.appendChild(tempLink);
-                tempLink.click();
-                document.body.removeChild(tempLink);
-                
-                // Show success message with instructions
+                // Show success message
                 setTimeout(() => {
-                    showAlert('✅ E-postklient öppnad! Om inget händer, använd alternativ nedan.', 'success');
+                    showAlert('✅ E-post öppnad! Lägg till mottagare och skicka.', 'success');
                     
-                    // Show options for different email methods
+                    // Backup option if needed
                     setTimeout(() => {
-                        if (confirm('Problem med e-postklient? Välj alternativ:\n\nOK = Öppna formaterat innehåll för kopiering\nAvbryt = Skapa PDF för nedladdning')) {
-                            // Show formatted popup
-                            showFormattedPopup(formData, subject);
-                        } else {
-                            // Generate PDF
-                            generatePDF(formData, subject);
+                        if (confirm('Om e-posten inte öppnades, vill du se en kopia för manuell kopiering?')) {
+                            showEmailPreview(formHtml, subject);
                         }
-                    }, 2000);
-                }, 500);
+                    }, 3000);
+                }, 1000);
                 
             } catch (error) {
-                showAlert('❌ E-postklient misslyckades. Prövar alternativa metoder...', 'error');
-                // Fallback to popup
-                setTimeout(() => showFormattedPopup(formData, subject), 1000);
+                // Fallback: show preview for copying
+                showEmailPreview(formHtml, subject);
             }
         }
         
-        function createHtmlEmailBody(formData, subject) {
-            let html = `
+        function createFilledFormHTML() {
+            // Clone the current form with all filled data
+            const container = document.querySelector('.container').cloneNode(true);
+            
+            // Remove action buttons
+            const actions = container.querySelector('.actions');
+            if (actions) actions.remove();
+            
+            // Add email-specific styling
+            const emailHtml = `
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
     <style>
-        body { font-family: Arial, sans-serif; line-height: 1.4; color: #333; }
-        .header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
-        .logo-text { font-size: 24px; font-weight: bold; }
-        .title { font-size: 18px; margin-top: 10px; }
-        .section { margin-bottom: 25px; }
-        .section-title { font-size: 16px; font-weight: bold; color: #0066FF; border-bottom: 2px solid #0066FF; padding-bottom: 5px; margin-bottom: 15px; }
-        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
-        .info-item { background: #f8f9fa; padding: 12px; border-radius: 6px; }
-        .info-label { font-size: 11px; font-weight: bold; color: #666; text-transform: uppercase; margin-bottom: 5px; }
-        .info-value { font-size: 14px; font-weight: 500; }
-        .test-item { background: white; border: 2px solid #f5f6fa; border-radius: 8px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .test-title { font-size: 16px; font-weight: 600; color: #0066FF; margin-bottom: 10px; }
-        .test-details { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
-        .test-detail { font-size: 12px; }
-        .status-yes { color: #00b894; font-weight: bold; }
-        .status-no { color: #636e72; }
-        .signature-section { background: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; }
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .logo-area { display: flex; align-items: center; gap: 15px; }
+        .logo { width: 35px; height: 35px; position: relative; transform: rotate(45deg); border-radius: 6px; overflow: hidden; }
+        .logo::before { content: ''; position: absolute; top: 0; left: 0; width: 50%; height: 50%; background: #FF0037; }
+        .logo::after { content: ''; position: absolute; bottom: 0; right: 0; width: 50%; height: 50%; background: #0066FF; }
+        .company-name { font-size: 24px; font-weight: 700; }
+        .doc-title { text-align: right; }
+        .doc-title h1 { font-size: 18px; margin-bottom: 5px; }
+        .doc-title h2 { font-size: 14px; opacity: 0.9; }
+        .content { padding: 20px; }
+        .section { margin-bottom: 20px; }
+        .section-title { font-size: 16px; font-weight: 600; color: #1a1a2e; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 2px solid #0066FF; }
+        .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px; }
+        .input-group { margin-bottom: 10px; }
+        .input-group label { display: block; font-size: 11px; font-weight: 600; color: #636e72; margin-bottom: 6px; text-transform: uppercase; }
+        .input-group input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+        .test-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+        .test-table th { background: linear-gradient(135deg, #0066FF 0%, #5f3dc4 100%); color: white; padding: 10px 8px; text-align: center; font-size: 11px; }
+        .test-table td { padding: 8px; font-size: 12px; border-bottom: 1px solid #f5f6fa; }
+        .description { font-weight: 500; padding-left: 10px; }
+        .checkbox-cell { text-align: center; }
+        .checkbox { width: 16px; height: 16px; }
+        .signature { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-top: 20px; }
         .signature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; }
-        .signature-item { background: white; padding: 12px; border-radius: 6px; }
-        .footer { text-align: center; margin-top: 30px; padding: 15px; background: #1a1a2e; color: white; border-radius: 6px; font-size: 12px; }
+        .signature-item { background: white; padding: 10px; border-radius: 6px; }
+        .signature-input { width: 100%; padding: 8px 0; border: none; border-bottom: 1px solid #b2bec3; font-size: 14px; }
+        .footer { background: #1a1a2e; color: white; padding: 15px; text-align: center; font-size: 11px; }
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="logo-text">SafeTeam</div>
-        <div class="title">Högtalare Provningsprotokoll</div>
-    </div>
-    
-    <div class="section">
-        <div class="section-title">Enhetsinformation</div>
-        <div class="info-grid">
-            ${formData.basic.number ? `<div class="info-item"><div class="info-label">Högtalarnummer</div><div class="info-value">${formData.basic.number}</div></div>` : ''}
-            ${formData.basic.model ? `<div class="info-item"><div class="info-label">Högtalarmodell</div><div class="info-value">${formData.basic.model}</div></div>` : ''}
-        </div>
-    </div>
-    
-    <div class="section">
-        <div class="section-title">Projektinformation</div>
-        <div class="info-grid">
-            ${formData.project.owner ? `<div class="info-item"><div class="info-label">Anläggningsägare</div><div class="info-value">${formData.project.owner}</div></div>` : ''}
-            ${formData.project.manager ? `<div class="info-item"><div class="info-label">Projektledare</div><div class="info-value">${formData.project.manager}</div></div>` : ''}
-            ${formData.project.technician ? `<div class="info-item"><div class="info-label">Ansvarig tekniker</div><div class="info-value">${formData.project.technician}</div></div>` : ''}
-            ${formData.project.workOrder ? `<div class="info-item"><div class="info-label">Arbetsordernummer</div><div class="info-value">${formData.project.workOrder}</div></div>` : ''}
-        </div>
-    </div>`;
-    
-            if (formData.tests.length > 0) {
-                html += `<div class="section"><div class="section-title">Kontrollpunkter</div>`;
-                formData.tests.forEach(test => {
-                    html += `
-        <div class="test-item">
-            <div class="test-title">${test.description}</div>
-            <div class="test-details">
-                <div class="test-detail">Ej i anl: <span class="${test.notInInstall ? 'status-yes' : 'status-no'}">${test.notInInstall ? 'JA' : 'NEJ'}</span></div>
-                <div class="test-detail">Kontrollerad: <span class="${test.checked ? 'status-yes' : 'status-no'}">${test.checked ? 'JA' : 'NEJ'}</span></div>
-                ${test.sign1 ? `<div class="test-detail">Sign: ${test.sign1}</div>` : ''}
-                ${test.corrected ? `<div class="test-detail">Åtgärdad: <span class="status-yes">JA</span></div>` : ''}
-                ${test.sign2 ? `<div class="test-detail">Åtgärd Sign: ${test.sign2}</div>` : ''}
-            </div>
-            ${test.remarks ? `<div style="margin-top: 10px; font-style: italic; color: #666;">Anmärkning: ${test.remarks}</div>` : ''}
-        </div>`;
-                });
-                html += `</div>`;
-            }
-    
-            html += `
-    <div class="signature-section">
-        <div class="section-title">Signering</div>
-        <div class="signature-grid">
-            ${formData.signature.selfCheck ? `<div class="signature-item"><div class="info-label">Egenkontroll</div><div class="info-value">${formData.signature.selfCheck}</div></div>` : ''}
-            ${formData.signature.name ? `<div class="signature-item"><div class="info-label">Namnförtydligande</div><div class="info-value">${formData.signature.name}</div></div>` : ''}
-            ${formData.signature.date ? `<div class="signature-item"><div class="info-label">Datum</div><div class="info-value">${formData.signature.date}</div></div>` : ''}
-        </div>
-    </div>
-    
-    <div class="footer">
-        SafeTeam Provningsprotokoll | KB04, 2024-10-18, SR | Generated with SafeTeam Protocol System
-    </div>
+    ${container.outerHTML}
 </body>
 </html>`;
             
-            return html;
+            return emailHtml;
         }
         
-        function showFormattedPopup(formData, subject) {
-            const htmlContent = createHtmlEmailBody(formData, subject);
-            const popup = window.open('', 'FormattedEmail', 'width=800,height=600,scrollbars=yes,resizable=yes');
+        function getEmailSubject() {
+            const numberInput = document.querySelector('.section:first-of-type input');
+            const modelInput = document.querySelector('.section:first-of-type input:nth-of-type(2)');
+            
+            const number = numberInput?.value || '';
+            const model = modelInput?.value || '';
+            
+            return `SafeTeam Provningsprotokoll${model ? ' - ' + model : ''}${number ? ' (' + number + ')' : ''}`;
+        }
+        
+        function showEmailPreview(formHtml, subject) {
+            const popup = window.open('', 'EmailPreview', 'width=900,height=700,scrollbars=yes');
             popup.document.write(`
                 <html>
                     <head>
-                        <title>SafeTeam Provningsprotokoll - ${subject}</title>
+                        <title>E-post förhandsgranskning</title>
                         <style>
-                            body { margin: 0; font-family: Arial, sans-serif; }
                             .controls { position: fixed; top: 0; left: 0; right: 0; background: #333; color: white; padding: 10px; z-index: 1000; }
                             .controls button { margin: 0 5px; padding: 8px 15px; background: #0066FF; color: white; border: none; border-radius: 4px; cursor: pointer; }
-                            .content { margin-top: 60px; padding: 20px; }
+                            .preview { margin-top: 50px; }
+                            .subject { background: #f0f0f0; padding: 10px; margin-bottom: 10px; font-weight: bold; }
                         </style>
                     </head>
                     <body>
                         <div class="controls">
-                            <button onclick="window.print()">🖨️ Skriv ut</button>
-                            <button onclick="copyToClipboard()">📋 Kopiera HTML</button>
+                            <button onclick="copyHtml()">📋 Kopiera HTML</button>
                             <button onclick="selectAll()">🎯 Markera allt</button>
+                            <button onclick="window.print()">🖨️ Skriv ut</button>
                             <button onclick="window.close()">❌ Stäng</button>
                         </div>
-                        <div class="content" id="content">
-                            ${htmlContent}
+                        <div class="subject">Ämne: ${subject}</div>
+                        <div class="preview" id="preview">
+                            ${formHtml}
                         </div>
                         <script>
-                            function copyToClipboard() {
-                                const content = document.getElementById('content').outerHTML;
-                                navigator.clipboard.writeText(content).then(() => {
-                                    alert('HTML-innehåll kopierat! Klistra in i din e-post som HTML.');
+                            function copyHtml() {
+                                const html = document.getElementById('preview').innerHTML;
+                                navigator.clipboard.writeText(html).then(() => {
+                                    alert('HTML kopierat! Klistra in i din e-post.');
                                 });
                             }
                             function selectAll() {
                                 const range = document.createRange();
-                                range.selectNode(document.getElementById('content'));
+                                range.selectNode(document.getElementById('preview'));
                                 window.getSelection().removeAllRanges();
                                 window.getSelection().addRange(range);
                             }
@@ -1380,41 +1238,6 @@
                     </body>
                 </html>
             `);
-        }
-        
-        function generatePDF(formData, subject) {
-            // Simple PDF generation using browser print to PDF
-            const printContent = document.cloneNode(true);
-            
-            // Hide actions and modify for PDF
-            const actions = printContent.querySelector('.actions');
-            if (actions) actions.style.display = 'none';
-            
-            const popup = window.open('', 'PDFGeneration', 'width=800,height=600');
-            popup.document.write(`
-                <html>
-                    <head>
-                        <title>${subject}</title>
-                        <style>
-                            @media print {
-                                body { margin: 0; }
-                                * { -webkit-print-color-adjust: exact !important; color-adjust: exact !important; }
-                            }
-                        </style>
-                    </head>
-                    <body>
-                        ${document.querySelector('.container').outerHTML}
-                        <script>
-                            window.onload = function() {
-                                alert('Använd Ctrl+P för att spara som PDF');
-                                setTimeout(() => window.print(), 500);
-                            }
-                        </script>
-                    </body>
-                </html>
-            `);
-            
-            showAlert('💾 PDF-fönster öppnat! Använd Ctrl+P och välj "Spara som PDF".', 'info');
         }
         
         function showAlert(message, type) {
