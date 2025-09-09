@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeTeam Provningsprotokoll - Högtalare</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #1a1a2e;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            padding: 25px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo {
+            width: 45px;
+            height: 45px;
+            position: relative;
+            transform: rotate(45deg);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .logo::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 50%;
+            height: 50%;
+            background: #FF0037;
+        }
+        
+        .logo::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 50%;
+            height: 50%;
+            background: #0066FF;
+        }
+        
+        .company-name {
+            font-size: 28px;
+            font-weight: 700;
+        }
+        
+        .doc-title {
+            text-align: right;
+        }
+        
+        .doc-title h1 {
+            font-size: 22px;
+            font-weight: 300;
+            margin-bottom: 5px;
+        }
+        
+        .doc-title h2 {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        /* Content */
+        .content {
+            padding: 30px;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #0066FF;
+            display: inline-block;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .input-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            color: #636e72;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #f5f6fa;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .input-group input:focus {
+            outline: none;
+            border-color: #0066FF;
+            box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
+        }
+        
+        /* Table */
+        .test-table {
+            width: 100%;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border-collapse: collapse;
+        }
+        
+        .test-table thead {
+            background: linear-gradient(135deg, #0066FF 0%, #5f3dc4 100%);
+            color: white;
+        }
+        
+        .test-table th {
+            padding: 12px 10px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .test-table tbody tr {
+            border-bottom: 1px solid #f5f6fa;
+            transition: background 0.2s ease;
+        }
+        
+        .test-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .test-table td {
+            padding: 10px 8px;
+            font-size: 13px;
+            vertical-align: middle;
+        }
+        
+        .description {
+            font-weight: 500;
+            text-align: left;
+            padding-left: 15px;
+        }
+        
+        .checkbox-cell {
+            text-align: center;
+            padding: 8px;
+        }
+        
+        .checkbox {
+            width: 18px;
+            height: 18px;
+            accent-color: #0066FF;
+            cursor: pointer;
+        }
+        
+        .input-cell input {
+            width: 100%;
+            padding: 6px 8px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        
+        .input-cell input:focus {
+            outline: none;
+            border-color: #0066FF;
+            box-shadow: 0 0 0 2px rgba(0, 102, 255, 0.1);
+        }
+        
+        .textarea-cell textarea {
+            width: 100%;
+            padding: 6px 8px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            font-size: 12px;
+            resize: vertical;
+            min-height: 32px;
+        }
+        
+        .textarea-cell textarea:focus {
+            outline: none;
+            border-color: #0066FF;
+            box-shadow: 0 0 0 2px rgba(0, 102, 255, 0.1);
+        }
+        
+        /* Signature */
+        .signature {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 25px;
+            margin-top: 30px;
+        }
+        
+        .signature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+        }
+        
+        .signature-item {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        
+        .signature-item label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            color: #636e72;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .signature-input {
+            width: 100%;
+            padding: 8px;
+            border: none;
+            border-bottom: 2px solid #b2bec3;
+            font-size: 14px;
+            background: transparent;
+            transition: border-color 0.3s ease;
+        }
+        
+        .signature-input:focus {
+            outline: none;
+            border-bottom-color: #0066FF;
+        }
+        
+        /* Action buttons */
+        .actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            padding: 25px;
+            background: #f8f9fa;
+        }
+        
+        .btn {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn-print {
+            background: white;
+            color: #1a1a2e;
+            border: 2px solid #b2bec3;
+        }
+        
+        .btn-save {
+            background: linear-gradient(135deg, #0066FF 0%, #5f3dc4 100%);
+            color: white;
+        }
+        
+        .btn-submit {
+            background: linear-gradient(135deg, #00b894 0%, #00d2d3 100%);
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+        
+        /* Footer */
+        .footer {
+            background: #1a1a2e;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+        }
+        
+        /* Print Styles */
+        @media print {
+            * {
+                -webkit-print-color-adjust: exact !important;
+                color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            
+            @page {
+                size: A4;
+                margin: 12mm;
+                margin-top: 8mm;
+                margin-bottom: 8mm;
+                /* Hide browser elements */
+                @top-left { content: ""; }
+                @top-right { content: ""; }
+                @top-center { content: ""; }
+                @bottom-left { content: ""; }
+                @bottom-right { content: ""; }
+                @bottom-center { content: ""; }
+            }
+            
+            /* Hide all browser print headers/footers */
+            html {
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            
+            body {
+                background: white !important;
+                padding: 0 !important;
+                font-size: 8pt;
+                line-height: 1.1;
+                margin: 0 !important;
+                -webkit-print-color-adjust: exact !important;
+            }
+            
+            /* Force clean professional print - no browser elements */
+            * {
+                -webkit-box-shadow: none !important;
+                box-shadow: none !important;
+            }
+            
+            /* Ensure no page breaks within sections */
+            .section {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+            
+            .test-table {
+                page-break-inside: auto !important;
+            }
+            
+            .test-table tr {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+            
+            .container {
+                width: 100% !important;
+                max-width: none !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                background: white !important;
+            }
+            
+            /* Header */
+            .header {
+                background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%) !important;
+                color: white !important;
+                padding: 4mm 6mm !important;
+                margin-bottom: 2mm !important;
+                border-radius: 2px !important;
+                display: flex !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+            }
+            
+            .logo-area {
+                display: flex !important;
+                align-items: center !important;
+                gap: 8px !important;
+            }
+            
+            .logo {
+                width: 22px !important;
+                height: 22px !important;
+            }
+            
+            .company-name {
+                font-size: 14px !important;
+                font-weight: 700 !important;
+            }
+            
+            .doc-title {
+                text-align: right !important;
+            }
+            
+            .doc-title h1 {
+                font-size: 13px !important;
+                margin-bottom: 1px !important;
+                font-weight: 600 !important;
+            }
+            
+            .doc-title h2 {
+                font-size: 10px !important;
+                opacity: 0.9 !important;
+            }
+            
+            /* Content */
+            .content {
+                padding: 2mm 0 !important;
+            }
+            
+            .section {
+                margin-bottom: 2mm !important;
+            }
+            
+            .section-title {
+                font-size: 9pt !important;
+                margin-bottom: 1mm !important;
+                padding-bottom: 0.5mm !important;
+                border-bottom: 1px solid #0066FF !important;
+            }
+            
+            .info-grid {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr !important;
+                gap: 2mm !important;
+                margin-bottom: 2mm !important;
+            }
+            
+            .input-group {
+                margin-bottom: 0 !important;
+            }
+            
+            .input-group label {
+                font-size: 6.5pt !important;
+                margin-bottom: 0.5mm !important;
+                font-weight: 700 !important;
+            }
+            
+            .input-group input {
+                padding: 1mm !important;
+                font-size: 8pt !important;
+                border: 1px solid #999 !important;
+                border-radius: 1px !important;
+                min-height: 14px !important;
+            }
+            
+            /* Table */
+            .test-table {
+                width: 100% !important;
+                font-size: 6pt !important;
+                border-radius: 2px !important;
+                margin-bottom: 2mm !important;
+                box-shadow: none !important;
+            }
+            
+            .test-table thead {
+                background: linear-gradient(135deg, #0066FF 0%, #5f3dc4 100%) !important;
+                color: white !important;
+            }
+            
+            .test-table th {
+                padding: 1.5mm 0.5mm !important;
+                font-size: 6pt !important;
+                font-weight: 700 !important;
+                line-height: 1 !important;
+            }
+            
+            .test-table td {
+                padding: 1mm 0.3mm !important;
+                font-size: 6pt !important;
+                line-height: 1 !important;
+                border-bottom: 0.3px solid #ddd !important;
+            }
+            
+            .test-table tbody tr:hover {
+                background: transparent !important;
+            }
+            
+            .description {
+                padding-left: 2mm !important;
+                font-weight: 600 !important;
+            }
+            
+            .checkbox-cell {
+                text-align: center !important;
+                padding: 1mm !important;
+            }
+            
+            .checkbox {
+                width: 10px !important;
+                height: 10px !important;
+            }
+            
+            .input-cell input,
+            .textarea-cell textarea {
+                padding: 0.5mm !important;
+                font-size: 6pt !important;
+                border: 0.3px solid #999 !important;
+                border-radius: 1px !important;
+                min-height: 12px !important;
+            }
+            
+            /* Signature */
+            .signature {
+                background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
+                padding: 2mm !important;
+                margin-top: 2mm !important;
+                border-radius: 2px !important;
+            }
+            
+            .signature-grid {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr 1fr !important;
+                gap: 2mm !important;
+            }
+            
+            .signature-item {
+                background: white !important;
+                padding: 2mm !important;
+                border-radius: 1px !important;
+                box-shadow: none !important;
+                border: 0.3px solid #ddd !important;
+            }
+            
+            .signature-item label {
+                font-size: 6pt !important;
+                margin-bottom: 2mm !important;
+                font-weight: 700 !important;
+            }
+            
+            .signature-input {
+                font-size: 7pt !important;
+                padding: 1mm !important;
+                border-bottom: 1px solid #666 !important;
+                min-height: 12px !important;
+            }
+            
+            /* Hide placeholder text when printing */
+            input::-webkit-input-placeholder {
+                color: transparent !important;
+            }
+            input::-moz-placeholder {
+                color: transparent !important;
+            }
+            input:-ms-input-placeholder {
+                color: transparent !important;
+            }
+            input::placeholder {
+                color: transparent !important;
+            }
+            
+            /* Footer */
+            .footer {
+                background: #1a1a2e !important;
+                color: white !important;
+                padding: 1.5mm !important;
+                font-size: 6pt !important;
+                border-radius: 1px !important;
+                margin-top: 2mm !important;
+            }
+            
+            /* Hide buttons */
+            .actions {
+                display: none !important;
+            }
+        }
+        
+        /* Mobile */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo-area">
+                <div class="logo"></div>
+                <span class="company-name">SafeTeam</span>
+            </div>
+            <div class="doc-title">
+                <h1>Provningsprotokoll</h1>
+                <h2>Enskild högtalare</h2>
+            </div>
+        </div>
+        
+        <!-- Content -->
+        <div class="content">
+            <!-- Device Info -->
+            <div class="section">
+                <h3 class="section-title">Enhetsinformation</h3>
+                <div class="info-grid">
+                    <div class="input-group">
+                        <label>Högtalarnummer</label>
+                        <input type="text">
+                    </div>
+                    <div class="input-group">
+                        <label>Högtalarmodell</label>
+                        <input type="text">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Project Info -->
+            <div class="section">
+                <h3 class="section-title">Projektinformation</h3>
+                <div class="info-grid">
+                    <div class="input-group">
+                        <label>Anläggningsägare</label>
+                        <input type="text">
+                    </div>
+                    <div class="input-group">
+                        <label>Projektledare</label>
+                        <input type="text">
+                    </div>
+                    <div class="input-group">
+                        <label>Ansvarig tekniker</label>
+                        <input type="text">
+                    </div>
+                    <div class="input-group">
+                        <label>Arbetsordernummer</label>
+                        <input type="text">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Test Table -->
+            <div class="section">
+                <h3 class="section-title">Kontrollpunkter</h3>
+                <table class="test-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 40%;">Beskrivning</th>
+                            <th style="width: 8%;">Ej i anl.</th>
+                            <th style="width: 8%;">Kontr.</th>
+                            <th style="width: 12%;">Sign</th>
+                            <th style="width: 18%;">Anmärkning</th>
+                            <th style="width: 8%;">Åtgärdad</th>
+                            <th style="width: 6%;">Sign</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="description">Upptagningsområde enligt beställning</td>
+                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
+                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell"><input type="text"></td>
+                            <td class="textarea-cell"><textarea></textarea></td>
+                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell"><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td class="description">Funktionskontroll (ljud)</td>
+                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
+                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell"><input type="text"></td>
+                            <td class="textarea-cell"><textarea></textarea></td>
+                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell"><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td class="description">Frekvensomfång (testsignal)</td>
+                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
+                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell"><input type="text"></td>
+                            <td class="textarea-cell"><textarea></textarea></td>
+                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell"><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td class="description">Max ljudnivå (SPL)</td>
+                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
+                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell"><input type="text"></td>
+                            <td class="textarea-cell"><textarea></textarea></td>
+                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell"><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td class="description">Tydlighet/taluppfattbarhet</td>
+                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
+                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell"><input type="text"></td>
+                            <td class="textarea-cell"><textarea></textarea></td>
+                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell"><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td class="description">Brusnivå</td>
+                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
+                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell"><input type="text"></td>
+                            <td class="textarea-cell"><textarea></textarea></td>
+                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell"><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td class="description">Nätverks-/signalförbindelse</td>
+                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
+                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell"><input type="text"></td>
+                            <td class="textarea-cell"><textarea></textarea></td>
+                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell"><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td class="description">Strömförsörjning</td>
+                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
+                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell"><input type="text"></td>
+                            <td class="textarea-cell"><textarea></textarea></td>
+                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell"><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td class="description">Ljudkvalitet</td>
+                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
+                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell"><input type="text"></td>
+                            <td class="textarea-cell"><textarea></textarea></td>
+                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell"><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td class="description">Rengöring högtalargaller/kapsling</td>
+                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
+                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell"><input type="text"></td>
+                            <td class="textarea-cell"><textarea></textarea></td>
+                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell"><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td class="description">IP Adress</td>
+                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
+                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell"><input type="text"></td>
+                            <td class="textarea-cell"><textarea></textarea></td>
+                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell"><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td class="description">Namn</td>
+                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
+                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell"><input type="text"></td>
+                            <td class="textarea-cell"><textarea></textarea></td>
+                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell"><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td class="description">Manipulationsskydd (tamper)</td>
+                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
+                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell"><input type="text"></td>
+                            <td class="textarea-cell"><textarea></textarea></td>
+                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell"><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td class="description">Test av I/O modul</td>
+                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
+                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell"><input type="text"></td>
+                            <td class="textarea-cell"><textarea></textarea></td>
+                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell"><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td class="description">Övrigt</td>
+                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
+                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell"><input type="text"></td>
+                            <td class="textarea-cell"><textarea style="min-height: 60px;"></textarea></td>
+                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell"><input type="text"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Signature -->
+            <div class="signature">
+                <h3 class="section-title">Signering</h3>
+                <div class="signature-grid">
+                    <div class="signature-item">
+                        <label>Egenkontroll (utförd av sign)</label>
+                        <input type="text" class="signature-input">
+                    </div>
+                    <div class="signature-item">
+                        <label>Namnförtydligande</label>
+                        <input type="text" class="signature-input">
+                    </div>
+                    <div class="signature-item">
+                        <label>Datum</label>
+                        <input type="text" class="signature-input">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Actions -->
+        <div class="actions">
+            <button class="btn btn-print" onclick="window.print()">🖨️ Skriv ut</button>
+            <button class="btn btn-save" onclick="saveData()">💾 Spara</button>
+            <button class="btn btn-submit" onclick="submitForm()">✅ Skicka in</button>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <span>KB04, 2024-10-18, SR</span>
+            <span>SafeTeam Audio Systems © 2024</span>
+        </div>
+    </div>
+    
+    <script>
+        function saveData() {
+            const formData = {};
+            
+            document.querySelectorAll('input[type="text"], input[type="date"], textarea').forEach((input, index) => {
+                formData[`field_${index}`] = input.value;
+            });
+            
+            document.querySelectorAll('input[type="checkbox"]').forEach((checkbox, index) => {
+                formData[`check_${index}`] = checkbox.checked;
+            });
+            
+            localStorage.setItem('speakerData', JSON.stringify(formData));
+            showAlert('Data sparad!', 'success');
+        }
+        
+        function loadData() {
+            const savedData = localStorage.getItem('speakerData');
+            if (savedData) {
+                const formData = JSON.parse(savedData);
+                
+                document.querySelectorAll('input[type="text"], input[type="date"], textarea').forEach((input, index) => {
+                    if (formData[`field_${index}`]) {
+                        input.value = formData[`field_${index}`];
+                    }
+                });
+                
+                document.querySelectorAll('input[type="checkbox"]').forEach((checkbox, index) => {
+                    if (formData[`check_${index}`] !== undefined) {
+                        checkbox.checked = formData[`check_${index}`];
+                    }
+                });
+            }
+        }
+        
+        function submitForm() {
+            showAlert('Formulär skickat!', 'success');
+        }
+        
+        function showAlert(message, type) {
+            const alert = document.createElement('div');
+            alert.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 25px;
+                background: ${type === 'success' ? '#00b894' : '#d63031'};
+                color: white;
+                border-radius: 6px;
+                box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+                z-index: 1000;
+                font-weight: 600;
+            `;
+            alert.textContent = message;
+            document.body.appendChild(alert);
+            
+            setTimeout(() => alert.remove(), 3000);
+        }
+        
+        document.addEventListener('input', () => {
+            clearTimeout(window.saveTimeout);
+            window.saveTimeout = setTimeout(saveData, 2000);
+        });
+        
+        window.addEventListener('DOMContentLoaded', loadData);
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                if (e.key === 's') {
+                    e.preventDefault();
+                    saveData();
+                } else if (e.key === 'p') {
+                    e.preventDefault();
+                    window.print();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
