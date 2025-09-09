@@ -608,20 +608,212 @@
             }
         }
         
-        /* Mobile */
+        /* Mobile Styles */
         @media (max-width: 768px) {
+            body {
+                padding: 10px;
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+            
+            .container {
+                border-radius: 8px;
+                margin: 0;
+            }
+            
             .header {
                 flex-direction: column;
                 gap: 15px;
                 text-align: center;
+                padding: 20px;
+            }
+            
+            .logo {
+                width: 35px;
+                height: 35px;
+            }
+            
+            .company-name {
+                font-size: 24px;
+            }
+            
+            .doc-title h1 {
+                font-size: 18px;
+            }
+            
+            .doc-title h2 {
+                font-size: 14px;
             }
             
             .content {
-                padding: 20px;
+                padding: 15px;
+            }
+            
+            .section-title {
+                font-size: 16px;
+                margin-bottom: 12px;
             }
             
             .info-grid {
                 grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .input-group input {
+                padding: 12px;
+                font-size: 16px; /* Prevents zoom on iOS */
+                border-radius: 8px;
+            }
+            
+            /* Mobile-friendly table */
+            .test-table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+                -webkit-overflow-scrolling: touch;
+                border-radius: 8px;
+            }
+            
+            .test-table thead,
+            .test-table tbody,
+            .test-table tr {
+                display: block;
+            }
+            
+            .test-table thead tr {
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+            
+            .test-table tr {
+                border: 2px solid #f5f6fa;
+                border-radius: 8px;
+                margin-bottom: 15px;
+                padding: 15px;
+                background: white;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+                white-space: normal;
+            }
+            
+            .test-table td {
+                border: none !important;
+                display: block;
+                text-align: left !important;
+                padding: 8px 0;
+                position: relative;
+            }
+            
+            .test-table td:before {
+                content: attr(data-label) ": ";
+                font-weight: 600;
+                color: #1a1a2e;
+                display: inline-block;
+                min-width: 120px;
+                margin-right: 10px;
+            }
+            
+            .description {
+                font-size: 16px;
+                font-weight: 600;
+                color: #0066FF;
+                margin-bottom: 10px;
+                padding: 0 !important;
+            }
+            
+            .description:before {
+                content: "";
+            }
+            
+            .checkbox-cell,
+            .input-cell,
+            .textarea-cell {
+                padding: 5px 0 !important;
+            }
+            
+            .checkbox {
+                width: 20px;
+                height: 20px;
+                margin: 0 10px 0 0;
+            }
+            
+            .input-cell input,
+            .textarea-cell textarea {
+                width: 100%;
+                padding: 10px;
+                font-size: 16px;
+                border-radius: 6px;
+                border: 2px solid #e0e0e0;
+            }
+            
+            .textarea-cell textarea {
+                min-height: 60px;
+                resize: vertical;
+            }
+            
+            /* Signature section mobile */
+            .signature {
+                margin-top: 20px;
+                padding: 20px;
+                border-radius: 8px;
+            }
+            
+            .signature-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .signature-item {
+                padding: 15px;
+                border-radius: 8px;
+            }
+            
+            .signature-input {
+                padding: 12px 0;
+                font-size: 16px;
+                border-bottom: 2px solid #b2bec3;
+            }
+            
+            /* Mobile action buttons */
+            .actions {
+                flex-direction: column;
+                padding: 20px 15px;
+                gap: 15px;
+            }
+            
+            .btn {
+                padding: 15px 20px;
+                font-size: 16px;
+                border-radius: 8px;
+                width: 100%;
+                touch-action: manipulation; /* Prevents double-tap zoom */
+            }
+            
+            .footer {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+                padding: 15px;
+                font-size: 12px;
+            }
+        }
+        
+        /* Tablet styles */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .container {
+                margin: 10px;
+            }
+            
+            .content {
+                padding: 25px;
+            }
+            
+            .test-table {
+                font-size: 12px;
+            }
+            
+            .test-table th,
+            .test-table td {
+                padding: 8px 6px;
             }
         }
     </style>
@@ -698,138 +890,138 @@
                     <tbody>
                         <tr>
                             <td class="description">Upptagningsområde enligt beställning</td>
-                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
-                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
-                            <td class="input-cell"><input type="text"></td>
-                            <td class="textarea-cell"><textarea></textarea></td>
-                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
-                            <td class="input-cell"><input type="text"></td>
+                            <td class="checkbox-cell" data-label="Ej i anl."><input type="checkbox" class="checkbox"></td>
+                            <td class="checkbox-cell" data-label="Kontr."><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell" data-label="Sign"><input type="text"></td>
+                            <td class="textarea-cell" data-label="Anmärkning"><textarea></textarea></td>
+                            <td class="checkbox-cell" data-label="Åtgärdad"><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell" data-label="Sign"><input type="text"></td>
                         </tr>
                         <tr>
                             <td class="description">Funktionskontroll (ljud)</td>
-                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
-                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
-                            <td class="input-cell"><input type="text"></td>
-                            <td class="textarea-cell"><textarea></textarea></td>
-                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
-                            <td class="input-cell"><input type="text"></td>
+                            <td class="checkbox-cell" data-label="Ej i anl."><input type="checkbox" class="checkbox"></td>
+                            <td class="checkbox-cell" data-label="Kontr."><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell" data-label="Sign"><input type="text"></td>
+                            <td class="textarea-cell" data-label="Anmärkning"><textarea></textarea></td>
+                            <td class="checkbox-cell" data-label="Åtgärdad"><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell" data-label="Sign"><input type="text"></td>
                         </tr>
                         <tr>
                             <td class="description">Frekvensomfång (testsignal)</td>
-                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
-                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
-                            <td class="input-cell"><input type="text"></td>
-                            <td class="textarea-cell"><textarea></textarea></td>
-                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
-                            <td class="input-cell"><input type="text"></td>
+                            <td class="checkbox-cell" data-label="Ej i anl."><input type="checkbox" class="checkbox"></td>
+                            <td class="checkbox-cell" data-label="Kontr."><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell" data-label="Sign"><input type="text"></td>
+                            <td class="textarea-cell" data-label="Anmärkning"><textarea></textarea></td>
+                            <td class="checkbox-cell" data-label="Åtgärdad"><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell" data-label="Sign"><input type="text"></td>
                         </tr>
                         <tr>
                             <td class="description">Max ljudnivå (SPL)</td>
-                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
-                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
-                            <td class="input-cell"><input type="text"></td>
-                            <td class="textarea-cell"><textarea></textarea></td>
-                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
-                            <td class="input-cell"><input type="text"></td>
+                            <td class="checkbox-cell" data-label="Ej i anl."><input type="checkbox" class="checkbox"></td>
+                            <td class="checkbox-cell" data-label="Kontr."><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell" data-label="Sign"><input type="text"></td>
+                            <td class="textarea-cell" data-label="Anmärkning"><textarea></textarea></td>
+                            <td class="checkbox-cell" data-label="Åtgärdad"><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell" data-label="Sign"><input type="text"></td>
                         </tr>
                         <tr>
                             <td class="description">Tydlighet/taluppfattbarhet</td>
-                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
-                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
-                            <td class="input-cell"><input type="text"></td>
-                            <td class="textarea-cell"><textarea></textarea></td>
-                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
-                            <td class="input-cell"><input type="text"></td>
+                            <td class="checkbox-cell" data-label="Ej i anl."><input type="checkbox" class="checkbox"></td>
+                            <td class="checkbox-cell" data-label="Kontr."><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell" data-label="Sign"><input type="text"></td>
+                            <td class="textarea-cell" data-label="Anmärkning"><textarea></textarea></td>
+                            <td class="checkbox-cell" data-label="Åtgärdad"><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell" data-label="Sign"><input type="text"></td>
                         </tr>
                         <tr>
                             <td class="description">Brusnivå</td>
-                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
-                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
-                            <td class="input-cell"><input type="text"></td>
-                            <td class="textarea-cell"><textarea></textarea></td>
-                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
-                            <td class="input-cell"><input type="text"></td>
+                            <td class="checkbox-cell" data-label="Ej i anl."><input type="checkbox" class="checkbox"></td>
+                            <td class="checkbox-cell" data-label="Kontr."><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell" data-label="Sign"><input type="text"></td>
+                            <td class="textarea-cell" data-label="Anmärkning"><textarea></textarea></td>
+                            <td class="checkbox-cell" data-label="Åtgärdad"><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell" data-label="Sign"><input type="text"></td>
                         </tr>
                         <tr>
                             <td class="description">Nätverks-/signalförbindelse</td>
-                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
-                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
-                            <td class="input-cell"><input type="text"></td>
-                            <td class="textarea-cell"><textarea></textarea></td>
-                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
-                            <td class="input-cell"><input type="text"></td>
+                            <td class="checkbox-cell" data-label="Ej i anl."><input type="checkbox" class="checkbox"></td>
+                            <td class="checkbox-cell" data-label="Kontr."><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell" data-label="Sign"><input type="text"></td>
+                            <td class="textarea-cell" data-label="Anmärkning"><textarea></textarea></td>
+                            <td class="checkbox-cell" data-label="Åtgärdad"><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell" data-label="Sign"><input type="text"></td>
                         </tr>
                         <tr>
                             <td class="description">Strömförsörjning</td>
-                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
-                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
-                            <td class="input-cell"><input type="text"></td>
-                            <td class="textarea-cell"><textarea></textarea></td>
-                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
-                            <td class="input-cell"><input type="text"></td>
+                            <td class="checkbox-cell" data-label="Ej i anl."><input type="checkbox" class="checkbox"></td>
+                            <td class="checkbox-cell" data-label="Kontr."><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell" data-label="Sign"><input type="text"></td>
+                            <td class="textarea-cell" data-label="Anmärkning"><textarea></textarea></td>
+                            <td class="checkbox-cell" data-label="Åtgärdad"><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell" data-label="Sign"><input type="text"></td>
                         </tr>
                         <tr>
                             <td class="description">Ljudkvalitet</td>
-                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
-                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
-                            <td class="input-cell"><input type="text"></td>
-                            <td class="textarea-cell"><textarea></textarea></td>
-                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
-                            <td class="input-cell"><input type="text"></td>
+                            <td class="checkbox-cell" data-label="Ej i anl."><input type="checkbox" class="checkbox"></td>
+                            <td class="checkbox-cell" data-label="Kontr."><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell" data-label="Sign"><input type="text"></td>
+                            <td class="textarea-cell" data-label="Anmärkning"><textarea></textarea></td>
+                            <td class="checkbox-cell" data-label="Åtgärdad"><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell" data-label="Sign"><input type="text"></td>
                         </tr>
                         <tr>
                             <td class="description">Rengöring högtalargaller/kapsling</td>
-                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
-                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
-                            <td class="input-cell"><input type="text"></td>
-                            <td class="textarea-cell"><textarea></textarea></td>
-                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
-                            <td class="input-cell"><input type="text"></td>
+                            <td class="checkbox-cell" data-label="Ej i anl."><input type="checkbox" class="checkbox"></td>
+                            <td class="checkbox-cell" data-label="Kontr."><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell" data-label="Sign"><input type="text"></td>
+                            <td class="textarea-cell" data-label="Anmärkning"><textarea></textarea></td>
+                            <td class="checkbox-cell" data-label="Åtgärdad"><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell" data-label="Sign"><input type="text"></td>
                         </tr>
                         <tr>
                             <td class="description">IP Adress</td>
-                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
-                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
-                            <td class="input-cell"><input type="text"></td>
-                            <td class="textarea-cell"><textarea></textarea></td>
-                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
-                            <td class="input-cell"><input type="text"></td>
+                            <td class="checkbox-cell" data-label="Ej i anl."><input type="checkbox" class="checkbox"></td>
+                            <td class="checkbox-cell" data-label="Kontr."><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell" data-label="Sign"><input type="text"></td>
+                            <td class="textarea-cell" data-label="Anmärkning"><textarea></textarea></td>
+                            <td class="checkbox-cell" data-label="Åtgärdad"><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell" data-label="Sign"><input type="text"></td>
                         </tr>
                         <tr>
                             <td class="description">Namn</td>
-                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
-                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
-                            <td class="input-cell"><input type="text"></td>
-                            <td class="textarea-cell"><textarea></textarea></td>
-                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
-                            <td class="input-cell"><input type="text"></td>
+                            <td class="checkbox-cell" data-label="Ej i anl."><input type="checkbox" class="checkbox"></td>
+                            <td class="checkbox-cell" data-label="Kontr."><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell" data-label="Sign"><input type="text"></td>
+                            <td class="textarea-cell" data-label="Anmärkning"><textarea></textarea></td>
+                            <td class="checkbox-cell" data-label="Åtgärdad"><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell" data-label="Sign"><input type="text"></td>
                         </tr>
                         <tr>
                             <td class="description">Manipulationsskydd (tamper)</td>
-                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
-                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
-                            <td class="input-cell"><input type="text"></td>
-                            <td class="textarea-cell"><textarea></textarea></td>
-                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
-                            <td class="input-cell"><input type="text"></td>
+                            <td class="checkbox-cell" data-label="Ej i anl."><input type="checkbox" class="checkbox"></td>
+                            <td class="checkbox-cell" data-label="Kontr."><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell" data-label="Sign"><input type="text"></td>
+                            <td class="textarea-cell" data-label="Anmärkning"><textarea></textarea></td>
+                            <td class="checkbox-cell" data-label="Åtgärdad"><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell" data-label="Sign"><input type="text"></td>
                         </tr>
                         <tr>
                             <td class="description">Test av I/O modul</td>
-                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
-                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
-                            <td class="input-cell"><input type="text"></td>
-                            <td class="textarea-cell"><textarea></textarea></td>
-                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
-                            <td class="input-cell"><input type="text"></td>
+                            <td class="checkbox-cell" data-label="Ej i anl."><input type="checkbox" class="checkbox"></td>
+                            <td class="checkbox-cell" data-label="Kontr."><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell" data-label="Sign"><input type="text"></td>
+                            <td class="textarea-cell" data-label="Anmärkning"><textarea></textarea></td>
+                            <td class="checkbox-cell" data-label="Åtgärdad"><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell" data-label="Sign"><input type="text"></td>
                         </tr>
                         <tr>
                             <td class="description">Övrigt</td>
-                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
-                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
-                            <td class="input-cell"><input type="text"></td>
-                            <td class="textarea-cell"><textarea style="min-height: 60px;"></textarea></td>
-                            <td class="checkbox-cell"><input type="checkbox" class="checkbox"></td>
-                            <td class="input-cell"><input type="text"></td>
+                            <td class="checkbox-cell" data-label="Ej i anl."><input type="checkbox" class="checkbox"></td>
+                            <td class="checkbox-cell" data-label="Kontr."><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell" data-label="Sign"><input type="text"></td>
+                            <td class="textarea-cell" data-label="Anmärkning"><textarea style="min-height: 60px;"></textarea></td>
+                            <td class="checkbox-cell" data-label="Åtgärdad"><input type="checkbox" class="checkbox"></td>
+                            <td class="input-cell" data-label="Sign"><input type="text"></td>
                         </tr>
                     </tbody>
                 </table>
