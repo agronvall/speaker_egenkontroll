@@ -314,6 +314,11 @@
             color: white;
         }
         
+        .btn-email {
+            background: linear-gradient(135deg, #fd79a8 0%, #fdcb6e 100%);
+            color: white;
+        }
+        
         .btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(0,0,0,0.15);
@@ -853,6 +858,7 @@
         <!-- Actions -->
         <div class="actions">
             <button class="btn btn-print" onclick="window.print()">🖨️ Skriv ut</button>
+            <button class="btn btn-email" onclick="emailForm()">📧 Skicka via e-post</button>
             <button class="btn btn-save" onclick="saveData()">💾 Spara</button>
             <button class="btn btn-submit" onclick="submitForm()">✅ Skicka in</button>
         </div>
@@ -903,24 +909,171 @@
             showAlert('Formulär skickat!', 'success');
         }
         
+        function emailForm() {
+            // Show working message
+            showAlert('Förbereder e-post...', 'info');
+            
+            // Collect all form data
+            const formData = {
+                basic: {},
+                project: {},
+                tests: [],
+                signature: {}
+            };
+            
+            // Basic info
+            const basicInputs = document.querySelectorAll('.section:first-of-type input');
+            formData.basic.number = basicInputs[0]?.value || '';
+            formData.basic.model = basicInputs[1]?.value || '';
+            
+            // Project info
+            const projectInputs = document.querySelectorAll('.section:nth-of-type(2) input');
+            formData.project.owner = projectInputs[0]?.value || '';
+            formData.project.manager = projectInputs[1]?.value || '';
+            formData.project.technician = projectInputs[2]?.value || '';
+            formData.project.workOrder = projectInputs[3]?.value || '';
+            
+            // Test results - only include filled data
+            const testRows = document.querySelectorAll('.test-table tbody tr');
+            testRows.forEach((row, index) => {
+                const cells = row.querySelectorAll('td');
+                const description = cells[0]?.textContent || '';
+                const notInInstall = cells[1]?.querySelector('input')?.checked || false;
+                const checked = cells[2]?.querySelector('input')?.checked || false;
+                const sign1 = cells[3]?.querySelector('input')?.value || '';
+                const remarks = cells[4]?.querySelector('textarea')?.value || '';
+                const corrected = cells[5]?.querySelector('input')?.checked || false;
+                const sign2 = cells[6]?.querySelector('input')?.value || '';
+                
+                // Only include if there's actual data
+                if (notInInstall || checked || sign1 || remarks || corrected || sign2) {
+                    formData.tests.push({
+                        description,
+                        notInInstall,
+                        checked,
+                        sign1,
+                        remarks,
+                        corrected,
+                        sign2
+                    });
+                }
+            });
+            
+            // Signature data
+            const signatureInputs = document.querySelectorAll('.signature-input');
+            formData.signature.selfCheck = signatureInputs[0]?.value || '';
+            formData.signature.name = signatureInputs[1]?.value || '';
+            formData.signature.date = signatureInputs[2]?.value || '';
+            
+            // Create compact email content
+            let emailBody = `SafeTeam Högtalare Provningsprotokoll\n`;
+            emailBody += `======================================\n\n`;
+            
+            // Basic info
+            emailBody += `ENHETSINFO:\n`;
+            if (formData.basic.number) emailBody += `Nummer: ${formData.basic.number}\n`;
+            if (formData.basic.model) emailBody += `Modell: ${formData.basic.model}\n`;
+            emailBody += `\n`;
+            
+            // Project info
+            emailBody += `PROJEKT:\n`;
+            if (formData.project.owner) emailBody += `Ägare: ${formData.project.owner}\n`;
+            if (formData.project.manager) emailBody += `Projektledare: ${formData.project.manager}\n`;
+            if (formData.project.technician) emailBody += `Tekniker: ${formData.project.technician}\n`;
+            if (formData.project.workOrder) emailBody += `Arbetsorder: ${formData.project.workOrder}\n`;
+            emailBody += `\n`;
+            
+            // Test results - only filled ones
+            if (formData.tests.length > 0) {
+                emailBody += `KONTROLLPUNKTER:\n`;
+                formData.tests.forEach(test => {
+                    emailBody += `\n• ${test.description}\n`;
+                    if (test.notInInstall) emailBody += `  - Ej i anläggning: JA\n`;
+                    if (test.checked) emailBody += `  - Kontrollerad: JA\n`;
+                    if (test.sign1) emailBody += `  - Sign: ${test.sign1}\n`;
+                    if (test.remarks) emailBody += `  - Anmärkning: ${test.remarks}\n`;
+                    if (test.corrected) emailBody += `  - Åtgärdad: JA\n`;
+                    if (test.sign2) emailBody += `  - Åtgärd sign: ${test.sign2}\n`;
+                });
+                emailBody += `\n`;
+            }
+            
+            // Signature
+            emailBody += `SIGNERING:\n`;
+            if (formData.signature.selfCheck) emailBody += `Egenkontroll: ${formData.signature.selfCheck}\n`;
+            if (formData.signature.name) emailBody += `Namn: ${formData.signature.name}\n`;
+            if (formData.signature.date) emailBody += `Datum: ${formData.signature.date}\n`;
+            
+            emailBody += `\n---\nSafeTeam Provningsprotokoll\nKB04, 2024-10-18, SR`;
+            
+            // Create subject
+            const subject = `SafeTeam Provningsprotokoll${formData.basic.model ? ' - ' + formData.basic.model : ''}${formData.basic.number ? ' (' + formData.basic.number + ')' : ''}`;
+            
+            // Try different email approaches
+            try {
+                // Method 1: mailto link
+                const mailtoLink = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
+                
+                // Create a temporary link and click it
+                const tempLink = document.createElement('a');
+                tempLink.href = mailtoLink;
+                tempLink.style.display = 'none';
+                document.body.appendChild(tempLink);
+                tempLink.click();
+                document.body.removeChild(tempLink);
+                
+                // Show success message with instructions
+                setTimeout(() => {
+                    showAlert('✅ E-postklient öppnad! Om inget händer, kopiera texten nedan och skicka manuellt.', 'success');
+                    
+                    // Also show the content in a popup for manual copy
+                    if (confirm('Öppna popup med e-postinnehåll för manuell kopiering?')) {
+                        const popup = window.open('', 'EmailContent', 'width=600,height=400,scrollbars=yes');
+                        popup.document.write(`
+                            <html>
+                                <head><title>E-postinnehåll - SafeTeam</title></head>
+                                <body style="font-family: monospace; white-space: pre-wrap; padding: 20px;">
+<h3>Ämne:</h3>
+${subject}
+
+<h3>Innehåll:</h3>
+${emailBody}
+                                </body>
+                            </html>
+                        `);
+                    }
+                }, 500);
+                
+            } catch (error) {
+                showAlert('❌ Kunde inte öppna e-postklient. Kontrollera att du har en e-postklient installerad.', 'error');
+                console.error('Email error:', error);
+            }
+        }
+        
         function showAlert(message, type) {
             const alert = document.createElement('div');
+            const colors = {
+                success: '#00b894',
+                error: '#d63031', 
+                info: '#0984e3'
+            };
             alert.style.cssText = `
                 position: fixed;
                 top: 20px;
                 right: 20px;
                 padding: 15px 25px;
-                background: ${type === 'success' ? '#00b894' : '#d63031'};
+                background: ${colors[type] || colors.info};
                 color: white;
                 border-radius: 6px;
                 box-shadow: 0 10px 25px rgba(0,0,0,0.2);
                 z-index: 1000;
                 font-weight: 600;
+                max-width: 400px;
             `;
             alert.textContent = message;
             document.body.appendChild(alert);
             
-            setTimeout(() => alert.remove(), 3000);
+            setTimeout(() => alert.remove(), 4000);
         }
         
         document.addEventListener('input', () => {
