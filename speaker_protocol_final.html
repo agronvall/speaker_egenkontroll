@@ -1102,35 +1102,343 @@
         }
         
         function emailForm() {
-            showAlert('Förbereder e-post...', 'info');
+            showAlert('Skapar e-post...', 'info');
             
-            // Create a complete HTML email with the filled form
-            const formHtml = createFilledFormHTML();
-            const subject = getEmailSubject();
-            
-            // Try to open email client with HTML form
             try {
-                const mailtoLink = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(formHtml)}`;
+                // Get form data for subject line
+                const subject = getEmailSubject();
                 
-                // Open email client
-                window.location.href = mailtoLink;
+                // Create PDF-like HTML content
+                const emailContent = createEmailContent();
                 
-                // Show success message
+                // Method 1: Try mailto with HTML content
+                const mailtoLink = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailContent)}`;
+                
+                // Test if mailto works
+                const testLink = document.createElement('a');
+                testLink.href = mailtoLink;
+                testLink.style.display = 'none';
+                document.body.appendChild(testLink);
+                
+                // Click the link
+                testLink.click();
+                document.body.removeChild(testLink);
+                
+                // Show success and options
                 setTimeout(() => {
-                    showAlert('✅ E-post öppnad! Lägg till mottagare och skicka.', 'success');
+                    showAlert('E-postklient startad! Välj alternativ om inget händer:', 'success');
                     
-                    // Backup option if needed
                     setTimeout(() => {
-                        if (confirm('Om e-posten inte öppnades, vill du se en kopia för manuell kopiering?')) {
-                            showEmailPreview(formHtml, subject);
+                        const choice = confirm(
+                            'Välj metod för att skicka formuläret:\n\n' +
+                            'OK = Öppna PDF-vy för utskrift/e-post\n' +
+                            'Avbryt = Visa e-postinnehåll för kopiering'
+                        );
+                        
+                        if (choice) {
+                            generatePDFView();
+                        } else {
+                            showEmailPreview(emailContent, subject);
                         }
-                    }, 3000);
-                }, 1000);
+                    }, 2000);
+                }, 500);
                 
             } catch (error) {
-                // Fallback: show preview for copying
-                showEmailPreview(formHtml, subject);
+                showAlert('Startar alternativ metod...', 'info');
+                generatePDFView();
             }
+        }
+        
+        function createEmailContent() {
+            // Create simple text version of the form data
+            let content = `SafeTeam Högtalare Provningsprotokoll\n`;
+            content += `=========================================\n\n`;
+            
+            // Get basic info
+            const basicInputs = document.querySelectorAll('.section:first-of-type input');
+            const number = basicInputs[0]?.value || '';
+            const model = basicInputs[1]?.value || '';
+            
+            if (number || model) {
+                content += `ENHETSINFORMATION:\n`;
+                if (number) content += `Högtalarnummer: ${number}\n`;
+                if (model) content += `Högtalarmodell: ${model}\n`;
+                content += `\n`;
+            }
+            
+            // Get project info
+            const projectInputs = document.querySelectorAll('.section:nth-of-type(2) input');
+            const owner = projectInputs[0]?.value || '';
+            const manager = projectInputs[1]?.value || '';
+            const technician = projectInputs[2]?.value || '';
+            const workOrder = projectInputs[3]?.value || '';
+            
+            if (owner || manager || technician || workOrder) {
+                content += `PROJEKTINFORMATION:\n`;
+                if (owner) content += `Anläggningsägare: ${owner}\n`;
+                if (manager) content += `Projektledare: ${manager}\n`;
+                if (technician) content += `Ansvarig tekniker: ${technician}\n`;
+                if (workOrder) content += `Arbetsordernummer: ${workOrder}\n`;
+                content += `\n`;
+            }
+            
+            // Get test results
+            const testRows = document.querySelectorAll('.test-table tbody tr');
+            let hasTests = false;
+            let testContent = `KONTROLLPUNKTER:\n`;
+            
+            testRows.forEach((row) => {
+                const cells = row.querySelectorAll('td');
+                const description = cells[0]?.textContent || '';
+                const notInInstall = cells[1]?.querySelector('input')?.checked || false;
+                const checked = cells[2]?.querySelector('input')?.checked || false;
+                const sign1 = cells[3]?.querySelector('input')?.value || '';
+                const remarks = cells[4]?.querySelector('textarea')?.value || '';
+                const corrected = cells[5]?.querySelector('input')?.checked || false;
+                const sign2 = cells[6]?.querySelector('input')?.value || '';
+                
+                if (notInInstall || checked || sign1 || remarks || corrected || sign2) {
+                    hasTests = true;
+                    testContent += `\n• ${description}\n`;
+                    if (notInInstall) testContent += `  ✓ Ej i anläggning\n`;
+                    if (checked) testContent += `  ✓ Kontrollerad\n`;
+                    if (sign1) testContent += `  Sign: ${sign1}\n`;
+                    if (remarks) testContent += `  Anmärkning: ${remarks}\n`;
+                    if (corrected) testContent += `  ✓ Åtgärdad\n`;
+                    if (sign2) testContent += `  Åtgärd sign: ${sign2}\n`;
+                }
+            });
+            
+            if (hasTests) {
+                content += testContent + `\n`;
+            }
+            
+            // Get signature info
+            const signatureInputs = document.querySelectorAll('.signature-input');
+            const selfCheck = signatureInputs[0]?.value || '';
+            const name = signatureInputs[1]?.value || '';
+            const date = signatureInputs[2]?.value || '';
+            
+            if (selfCheck || name || date) {
+                content += `SIGNERING:\n`;
+                if (selfCheck) content += `Egenkontroll: ${selfCheck}\n`;
+                if (name) content += `Namnförtydligande: ${name}\n`;
+                if (date) content += `Datum: ${date}\n`;
+            }
+            
+            content += `\n---\nSafeTeam Audio Systems\nKB04, 2024-10-18, SR`;
+            
+            return content;
+        }
+        
+        function generatePDFView() {
+            // Create a printable version in new window
+            const printWindow = window.open('', 'PrintView', 'width=800,height=600,scrollbars=yes');
+            const container = document.querySelector('.container').cloneNode(true);
+            
+            // Remove action buttons
+            const actions = container.querySelector('.actions');
+            if (actions) actions.remove();
+            
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>SafeTeam Provningsprotokoll</title>
+                    <style>
+                        body { margin: 0; font-family: Arial, sans-serif; }
+                        .controls { 
+                            position: fixed; 
+                            top: 0; 
+                            left: 0; 
+                            right: 0; 
+                            background: #333; 
+                            color: white; 
+                            padding: 10px; 
+                            z-index: 1000;
+                            text-align: center;
+                        }
+                        .controls button { 
+                            margin: 0 10px; 
+                            padding: 10px 20px; 
+                            background: #0066FF; 
+                            color: white; 
+                            border: none; 
+                            border-radius: 5px; 
+                            cursor: pointer;
+                            font-size: 14px;
+                        }
+                        .controls button:hover { background: #0052cc; }
+                        .content { 
+                            margin-top: 80px; 
+                            padding: 20px;
+                        }
+                        .container {
+                            max-width: 800px;
+                            margin: 0 auto;
+                            background: white;
+                            border-radius: 8px;
+                            overflow: hidden;
+                            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                        }
+                        .header {
+                            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+                            color: white;
+                            padding: 20px;
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                        }
+                        .logo-area { display: flex; align-items: center; gap: 15px; }
+                        .logo {
+                            width: 35px;
+                            height: 35px;
+                            position: relative;
+                            transform: rotate(45deg);
+                            border-radius: 6px;
+                            overflow: hidden;
+                        }
+                        .logo::before {
+                            content: '';
+                            position: absolute;
+                            top: 0;
+                            left: 0;
+                            width: 50%;
+                            height: 50%;
+                            background: #FF0037;
+                        }
+                        .logo::after {
+                            content: '';
+                            position: absolute;
+                            bottom: 0;
+                            right: 0;
+                            width: 50%;
+                            height: 50%;
+                            background: #0066FF;
+                        }
+                        .company-name { font-size: 24px; font-weight: 700; }
+                        .doc-title { text-align: right; }
+                        .doc-title h1 { font-size: 18px; margin-bottom: 5px; }
+                        .doc-title h2 { font-size: 14px; opacity: 0.9; }
+                        .content-inner { padding: 20px; }
+                        .section { margin-bottom: 20px; }
+                        .section-title {
+                            font-size: 16px;
+                            font-weight: 600;
+                            color: #1a1a2e;
+                            margin-bottom: 15px;
+                            padding-bottom: 8px;
+                            border-bottom: 2px solid #0066FF;
+                        }
+                        .info-grid {
+                            display: grid;
+                            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                            gap: 15px;
+                            margin-bottom: 15px;
+                        }
+                        .input-group label {
+                            display: block;
+                            font-size: 11px;
+                            font-weight: 600;
+                            color: #636e72;
+                            margin-bottom: 6px;
+                            text-transform: uppercase;
+                        }
+                        .input-group input {
+                            width: 100%;
+                            padding: 8px;
+                            border: 1px solid #ddd;
+                            border-radius: 4px;
+                            font-size: 14px;
+                        }
+                        .test-table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin-bottom: 15px;
+                        }
+                        .test-table th {
+                            background: linear-gradient(135deg, #0066FF 0%, #5f3dc4 100%);
+                            color: white;
+                            padding: 10px 8px;
+                            text-align: center;
+                            font-size: 11px;
+                        }
+                        .test-table td {
+                            padding: 8px;
+                            font-size: 12px;
+                            border-bottom: 1px solid #f5f6fa;
+                        }
+                        .description { font-weight: 500; padding-left: 10px; }
+                        .checkbox-cell { text-align: center; }
+                        .checkbox { width: 16px; height: 16px; }
+                        .signature {
+                            background: #f8f9fa;
+                            padding: 20px;
+                            border-radius: 8px;
+                            margin-top: 20px;
+                        }
+                        .signature-grid {
+                            display: grid;
+                            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                            gap: 15px;
+                        }
+                        .signature-item {
+                            background: white;
+                            padding: 10px;
+                            border-radius: 6px;
+                        }
+                        .signature-input {
+                            width: 100%;
+                            padding: 8px 0;
+                            border: none;
+                            border-bottom: 1px solid #b2bec3;
+                            font-size: 14px;
+                        }
+                        .footer {
+                            background: #1a1a2e;
+                            color: white;
+                            padding: 15px;
+                            text-align: center;
+                            font-size: 11px;
+                        }
+                        
+                        @media print {
+                            .controls { display: none; }
+                            .content { margin-top: 0; }
+                            * { -webkit-print-color-adjust: exact !important; color-adjust: exact !important; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="controls">
+                        <button onclick="window.print()">🖨️ Skriv ut som PDF</button>
+                        <button onclick="emailThis()">📧 Skicka via e-post</button>
+                        <button onclick="window.close()">❌ Stäng</button>
+                    </div>
+                    <div class="content">
+                        ${container.outerHTML}
+                    </div>
+                    <script>
+                        function emailThis() {
+                            const subject = 'SafeTeam Provningsprotokoll';
+                            const body = 'Hej,\\n\\nBifogad finns det ifyllda provningsprotokollet för högtalare.\\n\\nAnvänd Ctrl+P för att spara denna sida som PDF och bifoga den till e-posten.\\n\\nMed vänliga hälsningar';
+                            window.location.href = \`mailto:?subject=\${encodeURIComponent(subject)}&body=\${encodeURIComponent(body)}\`;
+                        }
+                        
+                        // Auto-focus print dialog
+                        window.onload = function() {
+                            setTimeout(() => {
+                                if (confirm('Vill du spara som PDF nu? (Tryck OK och välj "Spara som PDF" i utskriftsmenyn)')) {
+                                    window.print();
+                                }
+                            }, 500);
+                        }
+                    </script>
+                </body>
+                </html>
+            `);
+            
+            showAlert('📄 PDF-vy öppnad! Använd Ctrl+P för att spara som PDF och bifoga till e-post.', 'success');
         }
         
         function createFilledFormHTML() {
